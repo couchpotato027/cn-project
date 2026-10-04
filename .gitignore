@@ -1,0 +1,6 @@
+# generated / runtime
+build/
+run/
+# private keys and certs: share by AirDrop, never commit
+certs/
+.DS_Store
