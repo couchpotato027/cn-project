@@ -1,0 +1,8 @@
+Edge Verification Notes
+Date: 2026-10-05
+Verified by: Bhavay Goyal
+
+Status: Verified
+- Edge Nginx Primary configuration rendered and validated.
+- TLS termination with custom CA certificate verified.
+- Load balancing across backend app instances functioning as expected.
