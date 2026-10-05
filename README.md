@@ -56,7 +56,8 @@ templates/               config templates (dnsmasq, DNS records, nginx, pf firew
 build/                   GENERATED configs  (./scripts/render.sh)  – don't edit
 certs/                   GENERATED CA + server certificate (./scripts/make-certs.sh)
 run/                     runtime files: logs, pid files, backups
-evidence/                screenshots, pcaps and outputs for the evaluator
+config-bundle/           the exact generated configs + TLS setup notes + launch steps (deliverable)
+evidence/                screenshots, pcaps and outputs for the evaluator (index: evidence/README.md)
 scripts/                 every action is one script (list below)
 docs/                    runbook, concepts (viva prep), demo script, architecture, report
 ```

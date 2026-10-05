@@ -1,0 +1,10 @@
+Task A - network identity of Nishants-MacBook-Pro   (2026-10-05 14:22)
+Network service        Wi-Fi
+Wi-Fi SSID             <redacted>
+Active interface       en0
+Private IPv4           10.7.23.55
+Subnet mask            255.255.224.0  (/19)
+Network                10.7.0.0/19
+Default gateway        10.7.0.1
+MAC address            76:b1:b9:ff:e0:4b
+DNS resolvers in use   8.8.8.8 10.5.7.1 

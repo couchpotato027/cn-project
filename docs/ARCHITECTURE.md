@@ -1,6 +1,6 @@
 # Architecture Document – Team `team67`
 
-**Team:** Priyansh, Bhavay, Nishant · **Domain:** `team67.test` · **Network:** `<SSID>` · `10.7.0.0/19` (mask 255.255.224.0) · gateway `10.7.0.1`
+**Team:** Priyansh, Bhavay, Nishant · **Domain:** `team67.test` · **Network:** college Wi-Fi · `10.7.0.0/19` (mask 255.255.224.0) · gateway `10.7.0.1`
 
 ## 1. Network topology
 
