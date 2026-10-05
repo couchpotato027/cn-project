@@ -3,6 +3,9 @@
 # "Phase 1 is complete when a client resolves app.teamX.test, connects over
 #  HTTPS, and receives responses from both backends through the load balancer."
 source "$(dirname "$0")/common.sh"
+# A checker must keep going when something is down and report it, not exit
+# at the first failed curl (common.sh turns on "exit on error").
+set +e
 FAILS=0
 bad() { fail "$*"; FAILS=$((FAILS+1)); }
 
@@ -23,7 +26,7 @@ for t in "A $BACKEND_A_IP:$BACKEND_A_PORT" "B $BACKEND_B_IP:$BACKEND_B_PORT"; do
   set -- $t
   H="$(curl -s -D - -o /dev/null --connect-timeout 3 "http://$2/api/status" | awk -F': ' 'tolower($1)=="x-backend"{gsub(/\r/,"",$2);print $2}')"
   if [ "$H" = "$1" ]; then ok "backend $1 at $2 answers with X-Backend: $H"
-  else warn "backend $1 at $2 not reachable directly (fine ONLY if Extension C firewall is on)"; fi
+  else warn "backend $1 at $2 not reachable directly: is it running? (expected ONLY if Extension C firewall is on)"; fi
 done
 
 step "HTTPS through the edge (Task D/E) - by NAME, certificate validated"
