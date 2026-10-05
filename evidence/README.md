@@ -55,7 +55,7 @@ Laptop 3 Nishant `10.7.23.55` (Backend A). Domain `app.team67.test`. All capture
 | Layer / event | File |
 |---|---|
 | Capture run (DNS + TLS 1.2 + TLS 1.3 requests) | [`G-wireshark/G0-capture-run.jpeg`](G-wireshark/G0-capture-run.jpeg), [`pcap/full-flow-151340.pcap`](pcap/full-flow-151340.pcap) |
-| **DNS** query + response (client:ephemeral → 10.7.19.6:53/UDP, answer 10.7.27.44) | [`G-wireshark/G1-dns-query-response-nishant.jpeg`](G-wireshark/G1-dns-query-response-nishant.jpeg) |
+| **DNS** query + response (client:ephemeral → 10.7.19.6:53/UDP, answer 10.7.27.44) | [`G-wireshark/G1-dns-query-response-nishant.png`](G-wireshark/G1-dns-query-response-nishant.png) |
 | **TCP** SYN → SYN-ACK → ACK, ports 60824 → 443, seq/ack | [`G-wireshark/G2-G3-tcp-tls-handshake.png`](G-wireshark/G2-G3-tcp-tls-handshake.png) |
 | **TLS** ClientHello, ServerHello, Certificate, ChangeCipherSpec, encrypted Application Data | [`G-wireshark/G2-G3-tcp-tls-handshake.png`](G-wireshark/G2-G3-tcp-tls-handshake.png), [`G-wireshark/G8-flow-graph.jpeg`](G-wireshark/G8-flow-graph.jpeg) |
 | SNI in ClientHello | [`G-wireshark/G6-client-hello-sni.jpeg`](G-wireshark/G6-client-hello-sni.jpeg) |
