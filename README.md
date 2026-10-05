@@ -6,39 +6,44 @@ Every step can be captured in Wireshark.
 
 > *The application stays simple – the network is the project.*
 
-Team (current): **Priyansh** (Laptop 1) and **Bhavay** (Laptop 2).
+Team: **Priyansh** (Laptop 1), **Bhavay** (Laptop 2), **Nishant** (Laptop 3).
 The project rules allow 1–4 members, and teams of 2–3 may combine machine roles.
-If more members join, see [docs/04-FOUR-MEMBER-SPLIT.md](docs/04-FOUR-MEMBER-SPLIT.md). The only thing that changes is `team.env`.
+For other team sizes see [docs/04-TEAM-SPLIT.md](docs/04-TEAM-SPLIT.md). The only thing that changes is `team.env`.
 
 ---
 
-## 2-member layout
+## 3-member layout
 
 ```
-                 private Wi-Fi / hotspot  (same subnet, e.g. 192.168.1.0/24)
-   ┌──────────────────────────────────┐          ┌──────────────────────────────────────────┐
-   │ LAPTOP 1 – Priyansh  ("Mac 1")   │          │ LAPTOP 2 – Bhavay  ("Mac 2 + 3 + 4")     │
-   │                                  │  DNS     │                                          │
-   │  Test client (curl / browser) ───┼─UDP 53──►│  (backup DNS, Phase 2 Ext A)             │
-   │  Primary DNS  dnsmasq :53  ◄─────┼──────────┤  Edge: nginx :443 TLS + load balancer    │
-   │  (standby edge, Phase 2 Ext E)   │  HTTPS   │      ├─► Backend A  python :3001         │
-   │                               ───┼─TCP 443─►│      └─► Backend B  python :3002         │
-   └──────────────────────────────────┘          └──────────────────────────────────────────┘
+                      private Wi-Fi / hotspot  (same subnet)
+ ┌────────────────────────────┐   ┌────────────────────────────────┐   ┌────────────────────────────────┐
+ │ LAPTOP 1 – Priyansh        │   │ LAPTOP 2 – Bhavay              │   │ LAPTOP 3 – Nishant             │
+ │ "Mac 1"                    │   │ "Mac 2 + Mac 4"                │   │ "Mac 3"                        │
+ │                            │   │                                │   │                                │
+ │ Test client (curl/browser) │   │ Edge: nginx :443               │   │ Backend A  python :3001        │
+ │ Primary DNS dnsmasq :53    │   │   TLS + round-robin LB ────────┼──►│                                │
+ │                            │   │   └─► Backend B python :3002   │   │ (backup DNS :53, Ext A)        │
+ │                            │   │                                │   │ (standby edge :443, Ext E)     │
+ └────────────────────────────┘   └────────────────────────────────┘   └────────────────────────────────┘
+   client ── DNS udp/53 ──► L1 (backup: L3)        client ── HTTPS tcp/443 ──► L2 ──► A on L3 / B on L2
 ```
 
 | Role (from the PDF) | Runs on | Start command |
 |---|---|---|
 | Mac 1 – Private DNS + test client | Laptop 1 (Priyansh) | `./scripts/start-dns.sh primary` |
 | Mac 2 – Edge / reverse proxy / LB | Laptop 2 (Bhavay) | `./scripts/start-edge.sh primary` |
-| Mac 3 – Backend A | Laptop 2 (Bhavay) | `./scripts/start-backend.sh A` |
+| Mac 3 – Backend A | Laptop 3 (Nishant) | `./scripts/start-backend.sh A` |
 | Mac 4 – Backend B | Laptop 2 (Bhavay) | `./scripts/start-backend.sh B` |
-| Ext A – Backup DNS | Laptop 2 (Bhavay) | `./scripts/start-dns.sh backup` |
-| Ext E – Standby edge | Laptop 1 (Priyansh) | `./scripts/start-edge.sh standby` |
+| Ext A – Backup DNS | Laptop 3 (Nishant) | `./scripts/start-dns.sh backup` |
+| Ext E – Standby edge | Laptop 3 (Nishant) | `./scripts/start-edge.sh standby` |
 
-**Why this split:** the client and DNS are on a different laptop from the edge and backends.
-So every client request **really crosses the LAN**, and Wireshark shows real DNS, TCP and TLS
-packets between two machines. It also makes Extension C (firewall) clean: the client laptop is
-blocked, and the edge (same laptop as the backends) is allowed.
+**Why this split**
+- The client and DNS are on their own laptop, so every client request **really crosses the LAN**.
+- Backend A is on a **separate machine** from the edge, so edge→backend traffic crosses the LAN too.
+  For the Ext D failover demo you can shut Nishant's laptop entirely, and Backend B keeps serving.
+- Task B ("configure at least two other Macs to use Mac 1 as resolver") is now met exactly: L2 and L3.
+- Ext C: the firewall runs on both backend machines (L2, L3). The edge (L2) is allowed, and the client (L1) is blocked.
+- The work is spread evenly. Each person runs 2–3 services.
 
 ---
 
@@ -80,21 +85,23 @@ docs/                    runbook, concepts (viva prep), demo script, architectur
 ## Quick start (details: [docs/01-RUNBOOK.md](docs/01-RUNBOOK.md))
 
 ```bash
-# BOTH laptops, once
-brew install nginx dnsmasq && brew install --cask wireshark
-./scripts/network-info.sh            # note your IP, put both IPs into team.env (identical on both)
+# ALL 3 laptops, once
+brew install nginx dnsmasq openssl@3 && brew install --cask wireshark
+./scripts/network-info.sh            # note your IP, put all 3 IPs into team.env (identical everywhere)
 ./scripts/render.sh && ./scripts/whoami.sh && ./scripts/ping-all.sh
 
+# LAPTOP 3 (Nishant)
+./scripts/start-backend.sh A         # own terminal tab
+
 # LAPTOP 2 (Bhavay)
-./scripts/start-backend.sh A         # terminal tab 1
-./scripts/start-backend.sh B         # terminal tab 2
-./scripts/make-certs.sh              # then AirDrop the certs/ folder to Laptop 1
+./scripts/start-backend.sh B         # own terminal tab
+./scripts/make-certs.sh              # then AirDrop certs/ to Laptop 1 and Laptop 3
 ./scripts/start-edge.sh primary
 
 # LAPTOP 1 (Priyansh)
 ./scripts/start-dns.sh primary       # terminal tab 1, leave it running
 
-# BOTH laptops (clients)
+# ALL 3 laptops (clients)
 ./scripts/set-client-dns.sh && ./scripts/trust-ca.sh
 
 # LAPTOP 1 – prove it
@@ -106,6 +113,6 @@ brew install nginx dnsmasq && brew install --cask wireshark
 1. [docs/01-RUNBOOK.md](docs/01-RUNBOOK.md) – step-by-step build for Phase 1 and Phase 2, plus troubleshooting
 2. [docs/02-CONCEPTS.md](docs/02-CONCEPTS.md) – **viva prep**: every concept explained, with likely questions
 3. [docs/03-DEMO-SCRIPT.md](docs/03-DEMO-SCRIPT.md) – the 11-step final demo, command by command
-4. [docs/04-FOUR-MEMBER-SPLIT.md](docs/04-FOUR-MEMBER-SPLIT.md) – what to change if 2 more members join
+4. [docs/04-TEAM-SPLIT.md](docs/04-TEAM-SPLIT.md) – who owns what, and how to switch to 2 or 4 members
 5. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) – architecture document deliverable (topology, IP table, flow)
 6. [docs/PHASE2-REPORT.md](docs/PHASE2-REPORT.md) – Phase 2 final report template

@@ -1,14 +1,14 @@
-# Phase 2 Final Report – Team `team1` (Priyansh, Bhavay)
+# Phase 2 Final Report – Team `team1` (Priyansh, Bhavay, Nishant)
 
 > Template: fill in the *italic* parts with your own results and observations from the real runs.
 
 ## 1. What changed from Phase 1
 
-- Backup DNS resolver on Laptop 2 with the same records. Both laptops list two DNS servers.
+- Backup DNS resolver on Laptop 3 (Nishant) with the same records. Every laptop lists two DNS servers (L1, L3).
 - DNS TTL fixed at 30 s. Records moved to a reloadable hosts file so they can change live.
-- pf firewall anchor on the backend machine. Only the edge may reach ports 3001/3002.
+- pf firewall anchor on both backend machines (L2, L3). Only the edge may reach ports 3001/3002.
 - nginx passive health checks + automatic retry on the other backend.
-- Standby nginx edge on Laptop 1 with the same config and certificate, for DNS-based cutover.
+- Standby nginx edge on Laptop 3 with the same config and certificate, for DNS-based cutover.
 
 ## 2. Resilience tests and results
 

@@ -8,7 +8,12 @@
 # Re-running keeps the existing CA (so clients stay trusted) and only re-issues
 # the server certificate. Use --force-new-ca to start from scratch.
 source "$(dirname "$0")/common.sh"
-need openssl "brew install openssl"
+# macOS's own /usr/bin/openssl is LibreSSL, which lacks some options used here
+# (-addext, -ext). Prefer Homebrew's OpenSSL 3.
+OPENSSL="$(brew --prefix openssl@3 2>/dev/null)/bin/openssl"
+[ -x "$OPENSSL" ] || OPENSSL="$(command -v openssl)"
+"$OPENSSL" version | grep -q '^OpenSSL 3' || die "Need OpenSSL 3: brew install openssl@3"
+openssl() { "$OPENSSL" "$@"; }
 mkdir -p "$CERT_DIR"; cd "$CERT_DIR"
 
 if [ "${1:-}" = "--force-new-ca" ]; then rm -f ca.key ca.crt ca.srl; fi

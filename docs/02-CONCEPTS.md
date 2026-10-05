@@ -1,6 +1,6 @@
 # Concepts explained – what we built, how it works, and why (viva prep)
 
-Both Priyansh and Bhavay must be able to explain **any** part of this, not only the part
+Priyansh, Bhavay and Nishant must all be able to explain **any** part of this, not only the part
 they configured. Each section explains the concept with a link to the project, then lists
 questions examiners are likely to ask.
 
@@ -268,8 +268,8 @@ timeout), nginx (1) **retries the same request on B**, so the client still gets 
 nginx Plus and cloud LBs use **active** checks: they probe `/health` every few seconds.
 
 **Single point of failure (SPOF):** the edge nginx is the only entry point. If L2 dies, everything
-dies. In our 2-laptop layout L2 also hosts both backends, so **L2 itself is a SPOF**. With 4 members
-the backends sit on separate machines. To remove the edge SPOF:
+dies, and in our 3-laptop layout Backend B dies with it, since it also runs on L2. Backend A on L3 is
+already redundant: if L3 dies, B keeps serving. With 4 members only the edge would remain a SPOF. To remove the edge SPOF:
 - run **two edges** with a **floating virtual IP** (VRRP with keepalived: the standby takes over the IP in about 1 s)
 - or publish **multiple A records / DNS failover with health checks** (Route 53 health checks)
 - or use a managed, internally redundant load balancer (AWS ALB/NLB, GCP LB)
@@ -312,7 +312,7 @@ skip the edge. That means they can't bypass TLS, logging, rate limits and so on.
 | 3 | Can I open TCP to the port? | `nc -vz app.team1.test 443` | refused = nothing listening (nginx down / wrong port). Timeout = firewall |
 | 4 | Does TLS succeed? | `curl -v https://app.team1.test` / `openssl s_client -connect app.team1.test:443 -servername app.team1.test` | cert expired / wrong name / untrusted CA / wrong cert path |
 | 5 | Does HTTP succeed? | `curl -i https://app.team1.test/api/status` | 502 = edge can't reach backends. 404 = wrong path or server_name |
-| 6 | Backends themselves? | on L2: `curl -i http://<backend-IP>:3001/api/status` | backend stopped / wrong port / firewall |
+| 6 | Backends themselves? | on L2: `curl -i http://<L3-IP>:3001/api/status` and `http://<L2-IP>:3002/api/status` | backend stopped / wrong port / firewall |
 
 Typical injected faults: dnsmasq stopped, a record changed to a wrong IP, the client's DNS server changed,
 nginx stopped, an nginx upstream port changed, a backend stopped, the cert renamed or expired, a firewall
@@ -336,7 +336,7 @@ goes to the method.
 11. **What causes a 502?** The proxy works, but no upstream is reachable.
 12. **Round robin vs least_conn?** Rotation vs fewest active connections.
 13. **How does nginx detect a dead backend?** Passive checks: a failed request makes it retry the other backend and mark the dead one down for `fail_timeout`.
-14. **What's still a SPOF?** The edge (and in our 2-laptop layout, L2). Fixes: VRRP floating IP, multiple edges + DNS health checks, managed LB.
+14. **What's still a SPOF?** The edge, i.e. L2 (which also hosts Backend B in our 3-laptop layout). Fixes: VRRP floating IP, multiple edges + DNS health checks, managed LB.
 15. **Why `.test` and not `.local`?** `.local` is mDNS/Bonjour on macOS.
 16. **What does the 3-way handshake achieve?** Both sides agree on initial sequence numbers and confirm two-way reachability before sending data.
 17. **Refused vs timed out?** RST from the host (no listener) vs no answer (dropped by a firewall / host down).
