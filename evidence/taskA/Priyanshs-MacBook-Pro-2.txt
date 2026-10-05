@@ -1,0 +1,10 @@
+Task A - network identity of Priyanshs-MacBook-Pro-2   (2026-10-05 14:22)
+Network service        Wi-Fi
+Wi-Fi SSID             <redacted>
+Active interface       en0
+Private IPv4           10.7.19.6
+Subnet mask            255.255.224.0  (/19)
+Network                10.7.0.0/19
+Default gateway        10.7.0.1
+MAC address            be:ad:7d:98:37:82
+DNS resolvers in use   8.8.8.8 8.8.4.4 

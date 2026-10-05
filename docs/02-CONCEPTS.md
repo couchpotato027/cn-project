@@ -8,15 +8,15 @@ questions examiners are likely to ask.
 
 ## 1. The journey of ONE request (the big picture)
 
-You run `curl https://app.team1.test/api/status` on Laptop 1:
+You run `curl https://app.team67.test/api/status` on Laptop 1:
 
 | # | What happens | Protocol / layer | Where in our project |
 |---|---|---|---|
-| 1 | curl asks the OS "what's the IP of app.team1.test?" The OS checks its **DNS cache**. | – | macOS mDNSResponder |
+| 1 | curl asks the OS "what's the IP of app.team67.test?" The OS checks its **DNS cache**. | – | macOS mDNSResponder |
 | 2 | Cache miss: the OS sends a **DNS query** (UDP, source port random, dest port **53**) to the DNS server set in Network settings. | DNS over UDP | L1 → L1's dnsmasq |
-| 3 | dnsmasq looks up its records file and answers **A record: app.team1.test → L2's IP, TTL 30**. The OS caches it for 30 s. | DNS | `build/dns/records.hosts` |
+| 3 | dnsmasq looks up its records file and answers **A record: app.team67.test → L2's IP, TTL 30**. The OS caches it for 30 s. | DNS | `build/dns/records.hosts` |
 | 4 | curl opens a **TCP connection** to L2:443: SYN → SYN-ACK → ACK (3-way handshake). The client uses a random **ephemeral port** (e.g. 52314). | TCP | L1:52314 → L2:443 |
-| 5 | **TLS handshake** on top of TCP. ClientHello (with SNI = app.team1.test) → ServerHello + Certificate → key exchange → Finished. curl **validates** the certificate against our CA. | TLS | nginx on L2, `certs/` |
+| 5 | **TLS handshake** on top of TCP. ClientHello (with SNI = app.team67.test) → ServerHello + Certificate → key exchange → Finished. curl **validates** the certificate against our CA. | TLS | nginx on L2, `certs/` |
 | 6 | curl sends the **HTTP request** (HTTP/2) *inside* TLS, so on the wire it's encrypted "Application Data". | HTTP over TLS | – |
 | 7 | nginx **decrypts** it (TLS termination), picks a backend by **round robin**, and opens a *new* plain-HTTP TCP connection to it, adding `X-Forwarded-For`. | HTTP, reverse proxy | `upstream backends {}` |
 | 8 | The backend answers with JSON and the header `X-Backend: A`. | HTTP | `backend/server.py` |
@@ -69,18 +69,18 @@ Each layer **encapsulates** the one above. In Wireshark one packet shows
 ## 4. DNS (Task B, Ext A, Ext B)
 
 **What it is:** a distributed directory that turns names into records. Our **A records**
-map `app.team1.test` and `api.team1.test` to the **edge** IP, never to a backend.
+map `app.team67.test` and `api.team67.test` to the **edge** IP, never to a backend.
 
 **Roles**
 - **Stub resolver**: the OS part that asks questions (macOS mDNSResponder, with a cache).
 - **Recursive resolver**: does the work of finding answers (normally your ISP / 1.1.1.1).
 - **Authoritative server**: the source of truth for a zone. **Our dnsmasq is authoritative-like
-  for `team1.test`** (`local=/team1.test/` = answer locally, never forward) and a **forwarder** for
+  for `team67.test`** (`local=/team67.test/` = answer locally, never forward) and a **forwarder** for
   everything else (`server=1.1.1.1`), so internet names still work.
 
 **Our dnsmasq config, line by line** (`templates/dnsmasq.conf.tmpl`)
 - `listen-address=<LAN IP>` + `bind-interfaces`: answer only on this laptop's LAN address and loopback.
-- `local=/team1.test/`: queries for our zone are never sent upstream. Unknown names in it get **NXDOMAIN**.
+- `local=/team67.test/`: queries for our zone are never sent upstream. Unknown names in it get **NXDOMAIN**.
 - `addn-hosts=records.hosts`: the records live in a hosts-style file, so we can change them live with **SIGHUP**.
 - `local-ttl=30`: the TTL we hand out. dnsmasq's default is 0 (do not cache), which would make the TTL experiments impossible.
 - `no-resolv` + `server=1.1.1.1`: ignore /etc/resolv.conf and forward non-project names to 1.1.1.1.
@@ -154,11 +154,11 @@ why we run the same records file on both.
 
 **Why:** without TLS, anyone on the Wi-Fi can read and modify HTTP. TLS gives **confidentiality**
 (encryption), **integrity** (tamper detection) and **authentication** (the certificate proves the server
-is really app.team1.test).
+is really app.team67.test).
 
 **Certificates and trust – what `make-certs.sh` does**
 1. Creates our own **Certificate Authority**: a key pair plus a self-signed CA certificate (`CA:TRUE`).
-2. Creates a key pair for the server and a certificate for `app.team1.test` and `api.team1.test` in the
+2. Creates a key pair for the server and a certificate for `app.team67.test` and `api.team67.test` in the
    **Subject Alternative Name** (SAN) field, **signed by our CA**. It has `extendedKeyUsage=serverAuth`
    and is valid ≤ 397 days, because macOS rejects TLS certs without SAN/EKU or with long validity.
 3. `trust-ca.sh` adds the CA to the macOS **System keychain** as a trusted root.
@@ -248,7 +248,7 @@ headers. Our edge is the "CDN edge node" role.
 
 ## 8. Reverse proxy and load balancing (Task D, Ext D)
 
-**Reverse proxy:** the single public entry point. Clients only know `app.team1.test` → the edge IP.
+**Reverse proxy:** the single public entry point. Clients only know `app.team67.test` → the edge IP.
 Backends can change, scale or fail without clients knowing. That's why the client never needs backend
 IPs, and also why we can firewall them away (Ext C).
 
@@ -307,11 +307,11 @@ skip the edge. That means they can't bypass TLS, logging, rate limits and so on.
 | Step | Question | Command | If it fails → |
 |---|---|---|---|
 | 0 | Am I on the LAN? | `ipconfig getifaddr en0`, `ping <edge-IP>` | Wi-Fi / IP / subnet problem (layers 1-3) |
-| 1 | Does the name resolve? | `dig app.team1.test`, `dig @<dns-IP> app.team1.test` | DNS: server down, wrong record, client using wrong resolver, stale cache |
+| 1 | Does the name resolve? | `dig app.team67.test`, `dig @<dns-IP> app.team67.test` | DNS: server down, wrong record, client using wrong resolver, stale cache |
 | 2 | Is the right IP returned? | compare with team.env EDGE_IP | wrong record → `dns-point-app.sh edge`, flush |
-| 3 | Can I open TCP to the port? | `nc -vz app.team1.test 443` | refused = nothing listening (nginx down / wrong port). Timeout = firewall |
-| 4 | Does TLS succeed? | `curl -v https://app.team1.test` / `openssl s_client -connect app.team1.test:443 -servername app.team1.test` | cert expired / wrong name / untrusted CA / wrong cert path |
-| 5 | Does HTTP succeed? | `curl -i https://app.team1.test/api/status` | 502 = edge can't reach backends. 404 = wrong path or server_name |
+| 3 | Can I open TCP to the port? | `nc -vz app.team67.test 443` | refused = nothing listening (nginx down / wrong port). Timeout = firewall |
+| 4 | Does TLS succeed? | `curl -v https://app.team67.test` / `openssl s_client -connect app.team67.test:443 -servername app.team67.test` | cert expired / wrong name / untrusted CA / wrong cert path |
+| 5 | Does HTTP succeed? | `curl -i https://app.team67.test/api/status` | 502 = edge can't reach backends. 404 = wrong path or server_name |
 | 6 | Backends themselves? | on L2: `curl -i http://<L3-IP>:3001/api/status` and `http://<L2-IP>:3002/api/status` | backend stopped / wrong port / firewall |
 
 Typical injected faults: dnsmasq stopped, a record changed to a wrong IP, the client's DNS server changed,

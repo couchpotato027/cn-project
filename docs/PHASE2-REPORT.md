@@ -1,4 +1,4 @@
-# Phase 2 Final Report – Team `team1` (Priyansh, Bhavay, Nishant)
+# Phase 2 Final Report – Team `team67` (Priyansh, Bhavay, Nishant)
 
 > Template: fill in the *italic* parts with your own results and observations from the real runs.
 

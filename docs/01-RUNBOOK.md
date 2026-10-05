@@ -114,7 +114,7 @@ L2 and L3 are the "at least two other Macs" from Task B that resolve through Mac
 ./scripts/test-lb.sh                   # Task D: A, B, A, B ...
 ./scripts/test-cache.sh                # Task F: 200 -> 304
 ```
-In the browser, open **https://app.team1.test** (with your own team number). You should see a
+In the browser, open **https://app.team67.test** (with your own team number). You should see a
 padlock and no warning. Use Safari or Chrome. Firefox has its own certificate store and won't trust
 our CA.
 
@@ -138,25 +138,25 @@ Wireshark display filters to screenshot (save into `evidence/screenshots/`):
 
 | Show | Filter | What to point at |
 |---|---|---|
-| DNS | `dns` | query `app.team1.test` from client:ephemeral → L1:53/UDP; response with L2's IP and TTL 30 |
+| DNS | `dns` | query `app.team67.test` from client:ephemeral → L1:53/UDP; response with L2's IP and TTL 30 |
 | TCP handshake | `tcp.flags.syn==1` | SYN → SYN-ACK → ACK, ports client:5xxxx → L2:443 |
 | TCP seq/ack | any TCP packet → *Transmission Control Protocol* panel | relative Seq/Ack numbers, Window size |
-| TLS handshake | `tls.handshake` | ClientHello (has SNI `app.team1.test`), ServerHello, Certificate, ChangeCipherSpec, Finished |
+| TLS handshake | `tls.handshake` | ClientHello (has SNI `app.team67.test`), ServerHello, Certificate, ChangeCipherSpec, Finished |
 | Certificate | `tls.handshake.type == 11` | only visible in the **TLS 1.2** connection (TLS 1.3 encrypts it) |
 | Encrypted data | `tls.app_data` | "Application Data", unreadable, so HTTP is hidden |
 | Edge → backend (on L3) | `http` | plain-text `GET /api/status`, header `X-Forwarded-For` |
 
-Save the HTTP-header evidence with `curl -v https://app.team1.test/api/status 2>&1 | tee evidence/http/curl-v.txt`.
+Save the HTTP-header evidence with `curl -v https://app.team67.test/api/status 2>&1 | tee evidence/http/curl-v.txt`.
 
 ### Phase 1 – required failure demonstrations
 
 | Failure | How to cause it | What you'll see | Undo |
 |---|---|---|---|
-| Wrong DNS server on a client | L1: `./scripts/set-client-dns.sh --wrong` | `ping app.team1.test` → "cannot resolve", but `ping <L2-IP>` works. DNS and IP are independent. | `./scripts/set-client-dns.sh` |
+| Wrong DNS server on a client | L1: `./scripts/set-client-dns.sh --wrong` | `ping app.team67.test` → "cannot resolve", but `ping <L2-IP>` works. DNS and IP are independent. | `./scripts/set-client-dns.sh` |
 | DNS record points to wrong IP | L1: `./scripts/dns-point-app.sh <L3-IP>` (a real host with no web server), then `./scripts/flush-dns.sh` | `dig` succeeds with L3's IP. curl to :443 is refused. DNS is a directory, not a connection. | `./scripts/dns-point-app.sh edge` |
 | One backend stopped | L3: Ctrl+C in Backend A's tab (or close Nishant's lid) | `./scripts/test-lb.sh` → all B, zero errors | restart A |
 | Both backends stopped | L3 and L2: Ctrl+C both | DNS + TLS still work, `curl` → **502 Bad Gateway** from nginx. That's where the edge ends. | restart both |
-| Wrong destination port | L1: `curl https://app.team1.test:8444/` | ping works, but the TCP connection is refused (RST). IP and port are separate identifiers. | – |
+| Wrong destination port | L1: `curl https://app.team67.test:8444/` | ping works, but the TCP connection is refused (RST). IP and port are separate identifiers. | – |
 
 ---
 
@@ -171,9 +171,9 @@ Save the HTTP-header evidence with `curl -v https://app.team1.test/api/status 2>
 ./scripts/check-dns.sh                   # both servers answer
 # L1: stop the primary  -> Ctrl+C in the primary DNS tab
 ./scripts/flush-dns.sh
-dig app.team1.test                       # the first query may take ~1-5 s (primary times out), then works
-dscacheutil -q host -a name app.team1.test
-curl https://app.team1.test/api/status --cacert certs/ca.crt   # still works
+dig app.team67.test                       # the first query may take ~1-5 s (primary times out), then works
+dscacheutil -q host -a name app.team67.test
+curl https://app.team67.test/api/status --cacert certs/ca.crt   # still works
 ```
 Explain the difference. **DNS failure**: the name can't be resolved, so nothing even starts.
 **App server failure**: the name resolves and TCP/TLS to the edge work, but you get a 502.
@@ -247,7 +247,7 @@ breaks something, and the other two diagnose it layer by layer.
 | `ping` between laptops fails | not on the same network / client isolation → use a hotspot. Wrong IP in team.env → `network-info.sh`. |
 | `ping` works but `curl http://<ip>:3001` says "No route to host" | macOS Local Network permission for Terminal (Step 0). |
 | `curl` hangs to a backend port | macOS application firewall blocking python3 → allow it, or Ext C rules still loaded → `firewall-off.sh`. |
-| `dig @<L1-IP> app.team1.test` times out | dnsmasq not running / L1 asleep / wrong IP in team.env / firewall on L1. |
+| `dig @<L1-IP> app.team67.test` times out | dnsmasq not running / L1 asleep / wrong IP in team.env / firewall on L1. |
 | `dig @L1` works but `dscacheutil` / browser doesn't | this Mac isn't using the team DNS → `set-client-dns.sh`. VPN, Private Relay or Chrome secure-DNS active. |
 | `start-dns.sh`: "failed to create listening socket" | wrong DNS IP in team.env, or another DNS server already on :53 (`sudo lsof -nP -i :53`; stop it with `sudo brew services stop dnsmasq`). |
 | `start-edge.sh`: "Address already in use" | another nginx is on 80/443, e.g. Homebrew's own service → `brew services stop nginx` / `sudo brew services stop nginx`. Or set `HTTP_PORT=8080` / `HTTPS_PORT=8443` in team.env and run `render.sh` (allowed by the PDF). |

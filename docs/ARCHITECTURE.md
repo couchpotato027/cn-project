@@ -1,6 +1,6 @@
-# Architecture Document – Team `team1` (update the IPs before submitting)
+# Architecture Document – Team `team67`
 
-**Team:** Priyansh, Bhavay, Nishant · **Domain:** `team1.test` · **Network:** `<SSID>` · `<network>/<prefix>` · gateway `<gateway>`
+**Team:** Priyansh, Bhavay, Nishant · **Domain:** `team67.test` · **Network:** `<SSID>` · `10.7.0.0/19` (mask 255.255.224.0) · gateway `10.7.0.1`
 
 ## 1. Network topology
 
@@ -32,25 +32,25 @@ flowchart LR
 
 | Machine | Member | Interface | IPv4 / prefix | MAC | PDF role(s) | Services (port) | Cloud equivalent |
 |---|---|---|---|---|---|---|---|
-| Laptop 1 | Priyansh | en0 | `x.x.x.x/nn` | `xx:xx:…` | Mac 1: DNS + client | dnsmasq (53/udp+tcp) | Route 53 private hosted zone |
-| Laptop 2 | Bhavay | en0 | `x.x.x.x/nn` | `xx:xx:…` | Mac 2: edge · Mac 4: backend B | nginx (80→443, 443), python (3002) | ALB / CDN edge + EC2 instance |
-| Laptop 3 | Nishant | en0 | `x.x.x.x/nn` | `xx:xx:…` | Mac 3: backend A · backup DNS · standby edge | python (3001), dnsmasq (53), nginx standby (443) | EC2 instance, secondary DNS, standby LB |
+| Laptop 1 | Priyansh | en0 | `10.7.19.6/19` | `be:ad:7d:98:37:82` | Mac 1: DNS + client | dnsmasq (53/udp+tcp) | Route 53 private hosted zone |
+| Laptop 2 | Bhavay | en0 | `10.7.27.44/19` | `c2:f1:0a:e0:e1:08` | Mac 2: edge · Mac 4: backend B | nginx (80→443, 443), python (3002) | ALB / CDN edge + EC2 instance |
+| Laptop 3 | Nishant | en0 | `10.7.23.55/19` | `76:b1:b9:ff:e0:4b` | Mac 3: backend A · backup DNS · standby edge | python (3001), dnsmasq (53), nginx standby (443) | EC2 instance, secondary DNS, standby LB |
 
-(Fill in from `evidence/taskA/*.txt`.)
+(From `evidence/taskA/*.txt`, recorded 2026-10-05. Re-check before the demo: DHCP can change IPs. MACs are macOS private Wi-Fi addresses.)
 
 ## 3. DNS records (`build/dns/records.hosts`, TTL 30 s)
 
 | Name | Type | Value | Purpose |
 |---|---|---|---|
-| app.team1.test | A | L2 IP (edge) | the service |
-| api.team1.test | A | L2 IP (edge) | API alias |
-| dns1 / dns2 / edge / edge-standby / backend-a / backend-b .team1.test | A | infra IPs | diagnostics only |
+| app.team67.test | A | 10.7.27.44 (edge, L2) | the service |
+| api.team67.test | A | 10.7.27.44 (edge, L2) | API alias |
+| dns1 / dns2 / edge / edge-standby / backend-a / backend-b .team67.test | A | infra IPs | diagnostics only |
 
 ## 4. Request flow, with the protocol at each layer
 
 ```
 Client (L1)               DNS (L1)        Edge nginx (L2)                   Backend A (L3) / B (L2)
-   | DNS query A app.team1.test |                |                                    |
+   | DNS query A app.team67.test |                |                                    |
    |--- UDP :5xxxx -> :53 ----->|                |                                    |
    |<-- A <L2-IP> TTL 30 -------|                |                                    |
    |------------ TCP SYN :5xxxx -> :443 -------->|                                    |

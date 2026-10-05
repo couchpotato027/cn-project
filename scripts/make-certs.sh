@@ -12,7 +12,7 @@ source "$(dirname "$0")/common.sh"
 # (-addext, -ext). Prefer Homebrew's OpenSSL 3.
 OPENSSL="$(brew --prefix openssl@3 2>/dev/null)/bin/openssl"
 [ -x "$OPENSSL" ] || OPENSSL="$(command -v openssl)"
-"$OPENSSL" version | grep -q '^OpenSSL 3' || die "Need OpenSSL 3: brew install openssl@3"
+"$OPENSSL" version | grep -qE '^OpenSSL [3-9]' || die "Need OpenSSL 3 or newer: brew install openssl@3"
 openssl() { "$OPENSSL" "$@"; }
 mkdir -p "$CERT_DIR"; cd "$CERT_DIR"
 

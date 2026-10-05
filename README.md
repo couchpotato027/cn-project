@@ -1,6 +1,6 @@
 # CN Project – Private Network Service Platform
 
-A client types `https://app.team1.test`, which **our own DNS** resolves to **our own edge**.
+A client types `https://app.team67.test`, which **our own DNS** resolves to **our own edge**.
 The edge terminates **TLS** and **load-balances** the request to one of **two backends**.
 Every step can be captured in Wireshark.
 
