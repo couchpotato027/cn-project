@@ -6,6 +6,36 @@ Every step can be captured in Wireshark.
 
 > *The application stays simple – the network is the project.*
 
+## Team 67 – members
+
+| Member | Laptop | IP (2026-10-05) | Roles |
+|---|---|---|---|
+| **Priyansh Satija** | Laptop 1 | 10.7.19.6 | Private DNS (dnsmasq) + test client |
+| **Bhavay Goyal** | Laptop 2 | 10.7.27.44 | Edge (nginx: TLS + load balancer) + Backend B |
+| **Nishant Sharma** | Laptop 3 | 10.7.23.55 | Backend A (+ backup DNS, standby edge in Phase 2) |
+
+Submission type: **Type 2 – 3 Macs with combined roles** on one LAN (college Wi-Fi, 10.7.0.0/19).
+Service: **https://app.team67.test** · Evidence index: [evidence/README.md](evidence/README.md)
+
+## How to run the backends
+
+The backend is one file, [backend/server.py](backend/server.py) (Python 3 standard library only, nothing to install).
+Run each backend in its own terminal tab, from the project folder:
+
+```bash
+# Laptop 3 (Nishant) – Backend A on port 3001
+./scripts/start-backend.sh A        # = python3 backend/server.py --name A --port 3001
+
+# Laptop 2 (Bhavay) – Backend B on port 3002
+./scripts/start-backend.sh B        # = python3 backend/server.py --name B --port 3002
+```
+
+Both listen on `0.0.0.0` (reachable from the LAN) and answer `GET /`, `GET /api/status`, `GET /api/data`,
+every response carrying `X-Backend: A|B`. Test: `curl -i http://10.7.23.55:3001/api/status`.
+Full start-up order for all services: [config-bundle/README.md](config-bundle/README.md#launch-instructions-who-runs-what).
+
+---
+
 Team: **Priyansh** (Laptop 1), **Bhavay** (Laptop 2), **Nishant** (Laptop 3).
 The project rules allow 1–4 members, and teams of 2–3 may combine machine roles.
 For other team sizes see [docs/04-TEAM-SPLIT.md](docs/04-TEAM-SPLIT.md). The only thing that changes is `team.env`.
