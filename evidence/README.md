@@ -9,7 +9,7 @@ Laptop 3 Nishant `10.7.23.55` (Backend A). Domain `app.team67.test`. All capture
 | Requirement | File |
 |---|---|
 | IPv4, mask/prefix, gateway, interface, MAC of each Mac | [`taskA/Priyanshs-MacBook-Pro-2.txt`](taskA/Priyanshs-MacBook-Pro-2.txt), [`taskA/Bhavays-MacBook-Pro.txt`](taskA/Bhavays-MacBook-Pro.txt), [`taskA/Nishants-MacBook-Pro.txt`](taskA/Nishants-MacBook-Pro.txt) |
-| Ping between every pair | [`taskA/ping-from-Priyanshs-MacBook-Pro-2.txt`](taskA/ping-from-Priyanshs-MacBook-Pro-2.txt), [`A-lan/A2-ping-and-roles-bhavay.jpeg`](A-lan/A2-ping-and-roles-bhavay.jpeg), [`A-lan/A2-ping-and-client-dns-nishant.jpeg`](A-lan/A2-ping-and-client-dns-nishant.jpeg) |
+| Ping between every pair | [`taskA/ping-from-Priyanshs-MacBook-Pro-2.txt`](taskA/ping-from-Priyanshs-MacBook-Pro-2.txt), [`taskA/ping-from-Bhavays-MacBook-Pro.txt`](taskA/ping-from-Bhavays-MacBook-Pro.txt), [`taskA/ping-from-Nishants-MacBook-Pro.txt`](taskA/ping-from-Nishants-MacBook-Pro.txt), [`A-lan/A2-ping-and-roles-bhavay.jpeg`](A-lan/A2-ping-and-roles-bhavay.jpeg), [`A-lan/A2-ping-and-client-dns-nishant.jpeg`](A-lan/A2-ping-and-client-dns-nishant.jpeg) |
 | Topology diagram | [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) §1 |
 
 ## Task B – Private DNS
