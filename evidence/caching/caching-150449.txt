@@ -1,0 +1,47 @@
+
+[1m[36m==> 1) FULL request - no cache yet: server sends 200 + body + validators[0m
+[1m$ curl -sS -D - -o /dev/null --cacert /Users/priyanshsatija/Desktop/CN_Project/certs/ca.crt https://app.team67.test/api/data[0m
+HTTP/2 200 
+server: nginx/1.31.6
+date: Mon, 05 Oct 2026 09:34:49 GMT
+content-type: application/json
+content-length: 496
+x-backend: A
+cache-control: public, max-age=60
+etag: "991dbb578bcacac4"
+x-edge: primary (10.7.27.44)
+
+    Cache-Control: max-age=60 -> for 60 s a cache may reuse this WITHOUT asking (fresh hit).
+    ETag "991dbb578bcacac4" -> afterwards, ask 'has it changed?' instead of downloading again.
+
+[1m[36m==> 2) CONDITIONAL request - If-None-Match: "991dbb578bcacac4"[0m
+[1m$ curl -sS -D - -o /dev/null --cacert /Users/priyanshsatija/Desktop/CN_Project/certs/ca.crt -H If-None-Match: "991dbb578bcacac4" https://app.team67.test/api/data[0m
+HTTP/2 304 
+server: nginx/1.31.6
+date: Mon, 05 Oct 2026 09:34:50 GMT
+content-type: application/json
+x-backend: A
+cache-control: public, max-age=60
+etag: "991dbb578bcacac4"
+x-edge: primary (10.7.27.44)
+
+    304 Not Modified = headers only, no body: 'your copy is still valid'.
+
+[1m[36m==> 3) Conditional request with a STALE ETag -> full 200 again[0m
+[1m$ curl -sS -D - -o /dev/null --cacert /Users/priyanshsatija/Desktop/CN_Project/certs/ca.crt -H If-None-Match: "old-version" https://app.team67.test/api/data[0m
+HTTP/2 200 
+server: nginx/1.31.6
+date: Mon, 05 Oct 2026 09:34:50 GMT
+content-type: application/json
+content-length: 496
+x-backend: B
+cache-control: public, max-age=60
+etag: "991dbb578bcacac4"
+x-edge: primary (10.7.27.44)
+
+
+[1m[36m==> 4) Size comparison[0m
+    full request        -> HTTP 200, body 496 bytes
+    conditional request -> HTTP 304, body 0 bytes
+    Fresh cache hit (no request at all) is shown in the BROWSER: DevTools -> Network,
+    reload https://app.team67.test/api/data within 60 s -> Size column says '(disk cache)' / '(memory cache)'.

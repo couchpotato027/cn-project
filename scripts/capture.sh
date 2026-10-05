@@ -14,6 +14,11 @@ FILTER="port $DNS_PORT or port $HTTPS_PORT or port $HTTP_PORT or port $BACKEND_A
 
 step "Capturing on $IFACE -> ${PCAP#$ROOT/}"
 info "filter: $FILTER"
+if is_me "$DNS_PRIMARY_IP"; then
+  # Traffic from a Mac to its own IP goes over loopback (lo0), never over $IFACE.
+  warn "This Mac IS the DNS server, so its own DNS queries won't appear on $IFACE."
+  info "For DNS evidence, run this capture on another team laptop (a client)."
+fi
 
 if [ "$MODE" != "--auto" ]; then
   info "Make your requests in another terminal now. Ctrl+C here to stop."

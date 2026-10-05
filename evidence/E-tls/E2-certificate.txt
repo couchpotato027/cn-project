@@ -1,0 +1,12 @@
+== Certificate presented by https://app.team67.test (port 443)
+subject=O=CN Project team67, CN=app.team67.test
+issuer=O=CN Project team67, CN=CN Project team67 Local CA
+notBefore=Oct  5 09:07:37 2026 GMT
+notAfter=Nov  6 09:07:37 2027 GMT
+X509v3 Subject Alternative Name: 
+    DNS:app.team67.test, DNS:api.team67.test
+
+== Validation against our team CA
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 0 (ok)

@@ -1,0 +1,36 @@
+
+[1m[36m==> 1) Ask the PRIMARY team DNS server directly[0m
+[1m$ dig app.team67.test @10.7.19.6 -p 53 +noall +answer +stats[0m
+
+; <<>> DiG 9.10.6 <<>> app.team67.test @10.7.19.6 -p 53 +noall +answer +stats
+;; global options: +cmd
+app.team67.test.	30	IN	A	10.7.27.44
+;; Query time: 2 msec
+;; SERVER: 10.7.19.6#53(10.7.19.6)
+;; WHEN: Mon Oct 05 15:02:20 IST 2026
+;; MSG SIZE  rcvd: 60
+
+
+[1m[36m==> 2) Ask the BACKUP team DNS server directly[0m
+[1m$ dig app.team67.test @10.7.23.55 -p 53 +noall +answer +time=2 +tries=1[0m
+
+; <<>> DiG 9.10.6 <<>> app.team67.test @10.7.23.55 -p 53 +noall +answer +time=2 +tries=1
+;; global options: +cmd
+;; connection timed out; no servers could be reached
+
+[1m[36m==> 3) Ask the way apps do (macOS resolver = System Settings DNS + cache)[0m
+[1m$ dscacheutil -q host -a name app.team67.test[0m
+name: app.team67.test
+ip_address: 10.7.27.44
+
+
+[1m[36m==> 4) nslookup (uses the first configured DNS server)[0m
+[1m$ nslookup app.team67.test[0m
+Server:		10.7.19.6
+Address:	10.7.19.6#53
+
+Name:	app.team67.test
+Address: 10.7.27.44
+
+    Expected answer: app.team67.test -> 10.7.27.44 (the edge, NOT a backend).
+    The answer section line reads: name  TTL  IN  A  address

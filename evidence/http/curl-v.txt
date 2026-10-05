@@ -1,0 +1,69 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host app.team67.test:443 was resolved.
+* IPv6: (none)
+* IPv4: 10.7.27.44
+*   Trying 10.7.27.44:443...
+* Connected to app.team67.test (10.7.27.44) port 443
+* ALPN: curl offers h2,http/1.1
+* (304) (OUT), TLS handshake, Client hello (1):
+} [320 bytes data]
+*  CAfile: /etc/ssl/cert.pem
+*  CApath: none
+* (304) (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* (304) (IN), TLS handshake, Unknown (8):
+{ [47 bytes data]
+* (304) (IN), TLS handshake, Certificate (11):
+{ [951 bytes data]
+* (304) (IN), TLS handshake, CERT verify (15):
+{ [264 bytes data]
+* (304) (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* (304) (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256 / [blank] / UNDEF
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: O=CN Project team67; CN=app.team67.test
+*  start date: Oct  5 09:07:37 2026 GMT
+*  expire date: Nov  6 09:07:37 2027 GMT
+*  subjectAltName: host "app.team67.test" matched cert's "app.team67.test"
+*  issuer: O=CN Project team67; CN=CN Project team67 Local CA
+*  SSL certificate verify ok.
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://app.team67.test/api/status
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: app.team67.test]
+* [HTTP/2] [1] [:path: /api/status]
+* [HTTP/2] [1] [user-agent: curl/8.7.1]
+* [HTTP/2] [1] [accept: */*]
+> GET /api/status HTTP/2
+> Host: app.team67.test
+> User-Agent: curl/8.7.1
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/2 200 
+< server: nginx/1.31.6
+< date: Mon, 05 Oct 2026 09:42:18 GMT
+< content-type: application/json
+< content-length: 230
+< x-backend: B
+< cache-control: no-store
+< x-edge: primary (10.7.27.44)
+< 
+{ [230 bytes data]
+100   230  100   230    0     0    713      0 --:--:-- --:--:-- --:--:--   714
+* Connection #0 to host app.team67.test left intact
+{
+  "backend": "B",
+  "status": "ok",
+  "port": 3002,
+  "host": "Bhavays-MacBook-Pro.local",
+  "uptime_seconds": 2131.4,
+  "time": "2026-10-05T09:42:18+00:00",
+  "seen_peer": "10.7.27.44:59301",
+  "x_forwarded_for": "10.7.19.6"
+}
