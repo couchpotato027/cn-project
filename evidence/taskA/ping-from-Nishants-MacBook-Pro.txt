@@ -1,0 +1,22 @@
+Ping test from Nishants-MacBook-Pro (2026-10-05 14:28)
+-- ping 10.7.19.6
+PING 10.7.19.6 (10.7.19.6): 56 data bytes
+64 bytes from 10.7.19.6: icmp_seq=0 ttl=64 time=80.527 ms
+64 bytes from 10.7.19.6: icmp_seq=1 ttl=64 time=72.962 ms
+64 bytes from 10.7.19.6: icmp_seq=2 ttl=64 time=236.745 ms
+
+--- 10.7.19.6 ping statistics ---
+3 packets transmitted, 3 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 72.962/130.078/236.745/75.488 ms
+RESULT 10.7.19.6: reachable
+-- ping 10.7.27.44
+PING 10.7.27.44 (10.7.27.44): 56 data bytes
+64 bytes from 10.7.27.44: icmp_seq=0 ttl=64 time=73.961 ms
+64 bytes from 10.7.27.44: icmp_seq=1 ttl=64 time=49.124 ms
+64 bytes from 10.7.27.44: icmp_seq=2 ttl=64 time=111.027 ms
+
+--- 10.7.27.44 ping statistics ---
+3 packets transmitted, 3 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 49.124/78.037/111.027/25.436 ms
+RESULT 10.7.27.44: reachable
+-- 10.7.23.55 is THIS machine (skipped)

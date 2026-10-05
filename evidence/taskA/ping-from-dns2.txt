@@ -1,0 +1,22 @@
+Ping test from dns2 (2026-10-05 15:50)
+-- ping 10.7.19.6
+PING 10.7.19.6 (10.7.19.6): 56 data bytes
+64 bytes from 10.7.19.6: icmp_seq=0 ttl=64 time=29.808 ms
+64 bytes from 10.7.19.6: icmp_seq=1 ttl=64 time=56.541 ms
+64 bytes from 10.7.19.6: icmp_seq=2 ttl=64 time=72.617 ms
+
+--- 10.7.19.6 ping statistics ---
+3 packets transmitted, 3 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 29.808/52.989/72.617/17.656 ms
+RESULT 10.7.19.6: reachable
+-- ping 10.7.27.44
+PING 10.7.27.44 (10.7.27.44): 56 data bytes
+64 bytes from 10.7.27.44: icmp_seq=0 ttl=32 time=1001.257 ms
+64 bytes from 10.7.27.44: icmp_seq=1 ttl=32 time=818.039 ms
+64 bytes from 10.7.27.44: icmp_seq=2 ttl=32 time=820.247 ms
+
+--- 10.7.27.44 ping statistics ---
+3 packets transmitted, 3 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 818.039/879.848/1001.257/85.854 ms
+RESULT 10.7.27.44: reachable
+-- 10.7.23.55 is THIS machine (skipped)
