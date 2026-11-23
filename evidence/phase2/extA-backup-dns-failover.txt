@@ -1,0 +1,22 @@
+Extension A - backup DNS takes over (2026-11-23 23:35 IST), run on Laptop 1 (Priyansh, client)
+Primary DNS (Laptop 1, 10.7.26.79) was STOPPED first:
+$ dig +short +time=2 +tries=1 app.team67.test @10.7.26.79
+;; connection timed out; no servers could be reached
+
+Then, from the same client (Mac DNS settings: 10.7.26.79 10.7.19.207):
+$ ./scripts/flush-dns.sh && dig app.team67.test && curl -s -o /dev/null -w 'HTTP %{http_code}\n' https://app.team67.test/api/status
+
+; <<>> DiG 9.10.6 <<>> app.team67.test
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 23404
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; QUESTION SECTION:
+;app.team67.test.               IN      A
+;; ANSWER SECTION:
+app.team67.test.        30      IN      A       10.7.13.123
+;; Query time: 10 msec
+;; SERVER: 10.7.19.207#53(10.7.19.207)        <- Nishant's BACKUP DNS answered
+;; WHEN: Mon Nov 23 23:35:09 IST 2026
+;; MSG SIZE  rcvd: 60
+
+HTTP 200                                       <- service still reachable by name

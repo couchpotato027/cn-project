@@ -1,0 +1,4 @@
+Extension C rollback check - firewall rules removed on Laptops 2 and 3 - 2026-11-24 00:52 IST, from Laptop 1 (client)
+Direct access to the backends works again (it was blocked while the rules were loaded):
+http://10.7.19.207:3001 -> HTTP 200
+http://10.7.13.123:3002 -> HTTP 200

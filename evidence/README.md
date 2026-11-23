@@ -76,3 +76,43 @@ All five, with exact commands, output, explanation and restore step:
 | H3 | One backend stopped | 6/6 served by B, 0 failures |
 | H4 | Both backends stopped | `HTTP/2 502 Bad Gateway` from nginx |
 | H5 | Wrong destination port | ping OK, port 8444 `Couldn't connect` |
+
+---
+
+# Phase 2 – Harden, Recover, Troubleshoot (2026-11-23/24)
+
+Final report: [`../docs/PHASE2-REPORT.md`](../docs/PHASE2-REPORT.md) · all files in [`phase2/`](phase2/)
+Laptops this session: L1 Priyansh `10.7.26.79` (primary DNS, client) · L2 Bhavay `10.7.13.123` (edge + Backend B) · L3 Nishant `10.7.19.207` (Backend A, backup DNS, standby edge).
+
+| Item | Evidence |
+|---|---|
+| Phase 2 starting point (gate passes on the new IPs) | [`phase2/S1-gate-passed.txt`](phase2/S1-gate-passed.txt) |
+| **Ext A – backup DNS**: both servers answer | [`phase2/extA-A2-both-dns-answering.txt`](phase2/extA-A2-both-dns-answering.txt), backup started: [`phase2/extA-A1-backup-dns-started-nishant.webp`](phase2/extA-A1-backup-dns-started-nishant.webp) |
+| **Ext A** – primary stopped, backup answers (`SERVER: 10.7.19.207`), service still `HTTP 200` | [`phase2/extA-backup-dns-failover.txt`](phase2/extA-backup-dns-failover.txt) |
+| **Ext B – TTL 30**: server changes at once, OS cache keeps old IP 29 s | [`phase2/extB-ttl-timeline.txt`](phase2/extB-ttl-timeline.txt) |
+| **Ext B** – manual cache flush switches immediately | [`phase2/extB-flush-timeline.txt`](phase2/extB-flush-timeline.txt) |
+| **Ext C – firewall**: before (direct access works) | [`phase2/extC-1-before.txt`](phase2/extC-1-before.txt) |
+| **Ext C** – rules loaded on both backend laptops | [`phase2/extC-C1-firewall-on-nishant.webp`](phase2/extC-C1-firewall-on-nishant.webp), [`phase2/extC-C1-firewall-on-bhavay.webp`](phase2/extC-C1-firewall-on-bhavay.webp) |
+| **Ext C** – direct blocked, through the edge 200 | [`phase2/extC-2-isolation.txt`](phase2/extC-2-isolation.txt) |
+| **Ext C** – rollback (rules removed, direct access works again) | [`phase2/extC-3-rollback-check.txt`](phase2/extC-3-rollback-check.txt) |
+| **Ext D – failover**: Backend A stopped under load (0 failed), then restarted and rejoined | [`phase2/extD-failover.txt`](phase2/extD-failover.txt) · discarded first attempt: [`phase2/extD-attempt1-connectivity-glitch-NOT-failover.txt`](phase2/extD-attempt1-connectivity-glitch-NOT-failover.txt) |
+| **Ext E – standby edge** answers by name | [`phase2/extE-1-standby-edge.txt`](phase2/extE-1-standby-edge.txt) |
+| **Ext E – DNS cutover**: `X-Edge` primary → standby → primary, 0 failed | [`phase2/extE-cutover.txt`](phase2/extE-cutover.txt) · first attempt (no cutover happened): [`phase2/extE-attempt1-no-cutover-happened.txt`](phase2/extE-attempt1-no-cutover-happened.txt) |
+| **Ext F – troubleshooting**: layer-by-layer diagnosis, Backend B found down, fixed | [`phase2/extF-troubleshooting.txt`](phase2/extF-troubleshooting.txt) |
+
+## Phase 2 – screenshots from the teammates' Macs ([`phase2/screenshots/`](phase2/screenshots/))
+
+| Step | Screenshot |
+|---|---|
+| Setup – Nishant pulled the new IPs, rendered configs, roles listed (Backup DNS, Standby edge, Backend A), Backend A started | [`S2-setup-nishant-pull-render-whoami-backendA-started.jpeg`](phase2/screenshots/S2-setup-nishant-pull-render-whoami-backendA-started.jpeg) |
+| Setup – Bhavay pulled/rendered, roles listed (Edge nginx, Backend B) | [`S2-setup-bhavay-pull-render-whoami.jpeg`](phase2/screenshots/S2-setup-bhavay-pull-render-whoami.jpeg) |
+| Setup – Backend B listening on 10.7.13.123:3002 | [`S3-bhavay-backendB-running.jpeg`](phase2/screenshots/S3-bhavay-backendB-running.jpeg) |
+| Setup – primary edge started, pool A=10.7.19.207:3001 B=10.7.13.123:3002 | [`S3-bhavay-edge-started.jpeg`](phase2/screenshots/S3-bhavay-edge-started.jpeg) |
+| Setup – clients use the team DNS (`nameserver 10.7.26.79 / 10.7.19.207`), `dig` → 10.7.13.123 | [`S4-bhavay-client-dns-set-dig-ok.jpeg`](phase2/screenshots/S4-bhavay-client-dns-set-dig-ok.jpeg), [`S4-nishant-client-dns-set-dig-ok.jpeg`](phase2/screenshots/S4-nishant-client-dns-set-dig-ok.jpeg) |
+| **Ext A** – backup DNS running on Nishant's Mac (10.7.19.207:53, 8 names) | [`extA-A1-nishant-backup-dns-running.jpeg`](phase2/screenshots/extA-A1-nishant-backup-dns-running.jpeg) |
+| **Ext C** – firewall ON, rules listed (only 10.7.13.123 may reach 3001/3002) | [`extC-C1-nishant-firewall-on-original.jpeg`](phase2/screenshots/extC-C1-nishant-firewall-on-original.jpeg), [`extC-C1-bhavay-firewall-on-original.jpeg`](phase2/screenshots/extC-C1-bhavay-firewall-on-original.jpeg) |
+| **Ext C** – firewall OFF, "Isolation OFF – original firewall configuration restored" | [`extC-C3-nishant-firewall-off.jpeg`](phase2/screenshots/extC-C3-nishant-firewall-off.jpeg), [`extC-C3-bhavay-firewall-off.jpeg`](phase2/screenshots/extC-C3-bhavay-firewall-off.jpeg) |
+| **Ext C** – after rollback `pfctl -a com.apple/cnproject -s rules` prints no rules | [`extC-C3-bhavay-rules-empty-after-rollback-and-cert-share.jpeg`](phase2/screenshots/extC-C3-bhavay-rules-empty-after-rollback-and-cert-share.jpeg), [`extE-E1-and-C3-nishant-standby-dns-point-rules-empty.jpeg`](phase2/screenshots/extE-E1-and-C3-nishant-standby-dns-point-rules-empty.jpeg) |
+| **Ext D** – edge log: requests alternating, then the retries (`upstream=10.7.19.207:3001, 10.7.13.123:3002 upstream_status=502, 200`) while Backend A was down, then A rejoining | [`extD-D2-bhavay-edge-log-failover-retries-then-recovery.jpeg`](phase2/screenshots/extD-D2-bhavay-edge-log-failover-retries-then-recovery.jpeg), [`extD-D2-bhavay-edge-log-before-and-attempt.jpeg`](phase2/screenshots/extD-D2-bhavay-edge-log-before-and-attempt.jpeg) |
+| **Ext E** – standby edge started on Nishant's Mac (`standby edge started`, TLS terminated here, HTTP/2) | [`extE-E1-nishant-standby-edge-started.jpeg`](phase2/screenshots/extE-E1-nishant-standby-edge-started.jpeg), [`extE-E1-and-C3-nishant-standby-dns-point-rules-empty.jpeg`](phase2/screenshots/extE-E1-and-C3-nishant-standby-dns-point-rules-empty.jpeg) |
+| Server certificate files shared to Nishant for the standby edge (temporary LAN share, then removed) | [`extC-C3-bhavay-rules-empty-after-rollback-and-cert-share.jpeg`](phase2/screenshots/extC-C3-bhavay-rules-empty-after-rollback-and-cert-share.jpeg) |

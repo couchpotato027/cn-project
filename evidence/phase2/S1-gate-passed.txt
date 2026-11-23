@@ -1,0 +1,26 @@
+Phase 2 gate check - 2026-11-23 23:39 IST - run on Laptop 1 (Priyansh). IPs: L1 10.7.26.79 / L2 10.7.13.123 / L3 10.7.19.207
+
+==> Reachability (ping)
+  [PASS] 10.7.26.79 reachable
+  [PASS] 10.7.13.123 reachable
+  [PASS] 10.7.19.207 reachable
+
+==> DNS (Task B)
+  [PASS] team DNS: app.team67.test -> 10.7.13.123
+  [PASS] this Mac resolves app.team67.test -> 10.7.13.123 (System DNS points at the team DNS)
+
+==> Backends (Task C) - direct, bypassing the edge
+  [PASS] backend A at 10.7.19.207:3001 answers with X-Backend: A
+  [PASS] backend B at 10.7.13.123:3002 answers with X-Backend: B
+
+==> HTTPS through the edge (Task D/E) - by NAME, certificate validated
+  [PASS] https://app.team67.test -> HTTP 200, HTTP/2, certificate verified, connected to 10.7.13.123
+
+==> Load balancing (Task D)
+    sequence of backends: ABABAB
+  [PASS] both backends served requests
+
+==> Caching (Task F)
+  [PASS] conditional request -> 304 Not Modified
+
+  [PASS] PHASE 1 GATE PASSED

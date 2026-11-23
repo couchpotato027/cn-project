@@ -1,0 +1,37 @@
+A2 - both team DNS servers answering (before the failover test) - 2026-11-23 23:39 IST, from Laptop 1
+
+==> 1) Ask the PRIMARY team DNS server directly
+$ dig app.team67.test @10.7.26.79 -p 53 +noall +answer +stats
+
+; <<>> DiG 9.10.6 <<>> app.team67.test @10.7.26.79 -p 53 +noall +answer +stats
+;; global options: +cmd
+app.team67.test.	30	IN	A	10.7.13.123
+;; Query time: 21 msec
+;; SERVER: 10.7.26.79#53(10.7.26.79)
+;; WHEN: Mon Nov 23 23:39:56 IST 2026
+;; MSG SIZE  rcvd: 60
+
+
+==> 2) Ask the BACKUP team DNS server directly
+$ dig app.team67.test @10.7.19.207 -p 53 +noall +answer +time=2 +tries=1
+
+; <<>> DiG 9.10.6 <<>> app.team67.test @10.7.19.207 -p 53 +noall +answer +time=2 +tries=1
+;; global options: +cmd
+app.team67.test.	30	IN	A	10.7.13.123
+
+==> 3) Ask the way apps do (macOS resolver = System Settings DNS + cache)
+$ dscacheutil -q host -a name app.team67.test
+name: app.team67.test
+ip_address: 10.7.13.123
+
+
+==> 4) nslookup (uses the first configured DNS server)
+$ nslookup app.team67.test
+Server:		10.7.26.79
+Address:	10.7.26.79#53
+
+Name:	app.team67.test
+Address: 10.7.13.123
+
+    Expected answer: app.team67.test -> 10.7.13.123 (the edge, NOT a backend).
+    The answer section line reads: name  TTL  IN  A  address

@@ -1,0 +1,8 @@
+Extension C - isolation test from the CLIENT (Laptop 1, 10.7.26.79) with pf firewall ON on Laptops 2 and 3 - 2026-11-24 00:25 IST
+
+==> 1) Direct to the backends (should FAIL when isolation is on)
+  [PASS] http://10.7.19.207:3001 blocked  (TCP connect timed out - SYN dropped by pf)
+  [PASS] http://10.7.13.123:3002 blocked  (TCP connect timed out - SYN dropped by pf)
+
+==> 2) Through the edge (should still WORK)
+  [PASS] https://app.team67.test/api/status -> 200 via the edge

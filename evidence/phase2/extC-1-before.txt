@@ -1,0 +1,3 @@
+BEFORE firewall: direct access to the backends works from the client
+http://10.7.19.207:3001 -> HTTP 200
+http://10.7.13.123:3002 -> HTTP 200

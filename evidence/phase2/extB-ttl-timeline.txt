@@ -1,0 +1,33 @@
+Extension B - DNS TTL (30 s) and live record change - 2026-11-23 23:42 IST, from Laptop 1 (Priyansh)
+columns: time | what the macOS resolver (with cache) returns | what the primary DNS server answers right now (+TTL)
+23:42:37  OS-resolver=10.7.13.123    server=10.7.13.123 ttl=30
+23:42:39  OS-resolver=10.7.13.123    server=10.7.13.123 ttl=30
+23:42:41  OS-resolver=10.7.13.123    server=10.7.13.123 ttl=30
+23:42:43  OS-resolver=10.7.13.123    server=10.7.13.123 ttl=30
+>>> 23:42:45  RECORD CHANGE: app.team67.test 10.7.13.123 -> 10.7.19.207
+23:42:45  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:47  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:49  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:51  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:54  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:56  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:42:58  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:00  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:02  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:04  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:06  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:08  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:10  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:12  OS-resolver=10.7.13.123    server=10.7.19.207 ttl=30
+23:43:14  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:16  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:18  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:20  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:22  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:24  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:26  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:28  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:31  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:33  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:35  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30
+23:43:37  OS-resolver=10.7.19.207    server=10.7.19.207 ttl=30

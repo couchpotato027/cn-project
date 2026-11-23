@@ -1,0 +1,4 @@
+Extension E - standby edge on Laptop 3 (Nishant, 10.7.19.207) answers by name, tested via --resolve - 2026-11-24 00:43 IST
+HTTP/2 200 
+x-backend: B
+x-edge: standby (10.7.19.207)

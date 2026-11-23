@@ -1,0 +1,32 @@
+Extension F - troubleshooting practice (fault injected by Bhavay, diagnosed by Priyansh) - 2026-11-24 IST
+Method: bottom-up, one layer at a time (ping -> dig -> TCP port -> TLS/HTTP -> backends).
+
+1) NETWORK (IP)      $ ping -c 2 10.7.13.123
+   64 bytes from 10.7.13.123: icmp_seq=0 ttl=64 time=100.041 ms
+   2 packets transmitted, 2 packets received, 0.0% packet loss
+   -> host is up and reachable (ttl=64 = same subnet). Not a network fault.
+
+2) DNS               $ dig +short app.team67.test
+   10.7.13.123
+   -> resolves to the correct edge. Not a DNS fault.
+
+3) TCP (port 443)    $ nc -vz -G 3 app.team67.test 443
+   Connection to app.team67.test port 443 [tcp/https] succeeded!
+   -> nginx is listening. Not a transport fault.
+
+4) TLS + HTTP        $ curl -sv -m 6 https://app.team67.test/api/status | grep ...
+   * SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256
+   *  SSL certificate verify ok.
+   * using HTTP/2
+   < HTTP/2 200
+   -> TLS and HTTP fine. A single 200 can still hide a failed backend behind the edge.
+
+5) BACKENDS          $ curl http://10.7.19.207:3001/api/status  -> "backend": "A"   (up)
+                     $ curl http://10.7.13.123:3002/api/status  -> no answer          (DOWN)
+   6 requests through the edge: all 6 had  x-backend: A   (none from B)
+
+DIAGNOSIS: application layer - Backend B (Laptop 2, :3002) is stopped.
+Why users do not notice: nginx marks B down (max_fails=1 fail_timeout=10s) and sends everything to A.
+Fix: restart Backend B on Laptop 2:  ./scripts/start-backend.sh B
+    sequence of backends: ABABAB
+  [PASS] PHASE 1 GATE PASSED
